@@ -1,0 +1,4 @@
+base: tests/config/test_json_single_source.yml
+source:
+  rootIterator: items
+  resource: tests/test_sources/test_json_source.json
