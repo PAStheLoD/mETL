@@ -22,19 +22,20 @@ along with this program. If not, <see http://www.gnu.org/licenses/>.
 import metl.writer, metl.source.base, pickle, os, codecs, demjson, metl.migration
 from metl.exception import *
 
-class Target( metl.writer.Writer ):
+
+class Target(metl.writer.Writer):
 
     init = []
     resource_init = []
     
     # void
-    def __init__( self, reader, *args, **kwargs ):
+    def __init__(self, reader, *args, **kwargs):
 
         self.migration  = None
         self.tmigration = None
         self.fieldset   = {}
 
-        super( Target, self ).__init__( reader, *args, **kwargs )
+        super(Target, self).__init__(reader, *args, **kwargs)
 
     # unicode
     def getMigrationType( self ):
@@ -125,38 +126,36 @@ class Target( metl.writer.Writer ):
 
     # void
     def updateRecord( self, record, record_key ):
-
-        self.writeRecord( record )
+        self.writeRecord(record)
 
     # void
-    def writeRecord( self, record, record_hash ):
-
+    def writeRecord(self, record, record_hash=None):
         raise RuntimeError( 'Target.writeRecord() is not implemented yet!' )
 
     # list<FieldSet>
-    def write( self ):
+    def write(self, migration_date=None):
 
         for record in self.getRecords():
 
             if self.hasMigration():
-                status = self.migration.getRecordStatus( record )
+                status = self.migration.getRecordStatus(record)
                 if not status['exists']:
-                    self.writeRecord( record )
-                    self.log( record, 'write' )
+                    self.writeRecord(record)
+                    self.log(record, 'write')
 
                 elif status['exists'] and status['modified']:
-                    self.updateRecord( record, record.getKey() )
-                    self.log( record, 'update' )
+                    self.updateRecord(record, record.getKey())
+                    self.log(record, 'update')
 
                 elif status['exists'] and not status['modified']:
                     pass
 
             else:
-                self.writeRecord( record )
-                self.log( record, 'write' )
+                self.writeRecord(record)
+                self.log(record, 'write')
 
             if self.hasTargetMigration():
-                self.tmigration.addRecord( record )
+                self.tmigration.addRecord(record)
 
     # void
     def logActive( self, record, msgtype ):

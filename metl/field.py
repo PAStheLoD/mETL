@@ -23,6 +23,7 @@ from metl.exception import *
 from metl.tarr.compiler import Program, RETURN_TRUE
 from metl.tarr.data import Data
 
+
 class Field( object ):
 
     # void
@@ -95,19 +96,18 @@ class Field( object ):
         return field_type.isConvertable( self.value )
 
     # type
-    def getValue( self, to_string = False, class_to_string = False, without_list = False ):
-
-        if without_list and type( self.value ) == list:
-            return str( self.value )
+    def getValue(self, to_string=False, class_to_string=False, without_list=False ):
+        if without_list and type(self.value) == list:
+            return str(self.value)
 
         if not to_string and not class_to_string:
             return self.value
 
         if to_string and self.value is not None:
-            return str( self.value )
+            return str(self.value)
 
         if self.value is not None and class_to_string and self.value.__class__ in self.getType().getFieldClasses():
-            return str( self.value )
+            return str(self.value)
 
         elif self.value is not None and class_to_string:
             return self.value
@@ -123,9 +123,8 @@ class Field( object ):
         return self.field_name
 
     # void
-    def setValue( self, value ):
-
-        self.value = self.field_type.getValue( value )
+    def setValue(self, value):
+        self.value = self.field_type.getValue(value)
         if self.log:
             print('=>', repr( self.value ))
 

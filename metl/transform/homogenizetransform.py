@@ -24,10 +24,11 @@ from metl import tarr
 
 
 @tarr.rule
-def HomogenizeTransform( field ):
+def HomogenizeTransform(field):
 
     if field.getValue() is None:
         return field
 
-    field.setValue( unicodedata.normalize( 'NFKD', field.getValue().lower() ).encode( 'ascii', 'ignore' ) )
+    b = unicodedata.normalize('NFKD', field.getValue().lower()).encode('ascii', 'ignore')  # type: bytes
+    field.setValue(b.decode('ascii'))
     return field

@@ -19,10 +19,11 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, <see http://www.gnu.org/licenses/>.
 """
 
-import metl.reader, os, copy, urllib.parse, codecs, urllib.request, urllib.error, urllib.parse, demjson, http.client
+import os, copy, urllib.parse, codecs, urllib.request, urllib.error, urllib.parse, http.client
+import metl.reader, demjson
 
-def patch_http_response_read( func ):
-    def inner( *args ):
+def patch_http_response_read(func):
+    def inner(*args):
         try:
             return func(*args)
 
@@ -31,38 +32,40 @@ def patch_http_response_read( func ):
 
     return inner
 
-http.client.HTTPResponse.read = patch_http_response_read( http.client.HTTPResponse.read )
 
-def openResource( resource, mode, encoding = None, realm = None, host = None, username = None, password = None ):
+http.client.HTTPResponse.read = patch_http_response_read(http.client.HTTPResponse.read)
 
-    if type( resource ) in ( str, str ):
+
+def openResource(resource, mode, encoding=None, realm=None, host=None, username=None, password=None):
+
+    if type(resource) in (str, str):
         file_closable = True
 
-        parts = urllib.parse.urlparse( resource )
+        parts = urllib.parse.urlparse(resource)
 
-        if parts.scheme in ( '', 'file' ) or len( parts.scheme ) == 1:
+        if parts.scheme in ('', 'file') or len(parts.scheme) == 1:
             if mode and encoding:
-                file_pointer = codecs.open( resource, mode, encoding )
-
+                file_pointer = codecs.open(resource, mode, encoding)
             else:
-                file_pointer = codecs.open( resource, mode )
+                file_pointer = codecs.open(resource, mode)
 
         elif username is None or password is None or realm is None or host is None:
             file_pointer = urllib.request.urlopen( resource )
 
         else:
-            authinfo = urllib.request.HTTPBasicAuthHandler() 
-            authinfo.add_password( realm, host, username, password ) 
-            opener = urllib.request.build_opener(authinfo) 
-            file_pointer = opener.open( resource )
+            authinfo = urllib.request.HTTPBasicAuthHandler()
+            authinfo.add_password(realm, host, username, password)
+            opener = urllib.request.build_opener(authinfo)
+            file_pointer = opener.open(resource)
 
     else:
         file_closable = False
         file_pointer  = resource
 
-    return ( file_pointer, file_closable )
+    return (file_pointer, file_closable)
 
-class Source( metl.reader.Reader ):
+
+class Source(metl.reader.Reader):
 
     init = []
     resource_init = []
@@ -195,7 +198,7 @@ class FileSource( Source ):
         self.file_pointer, self.file_closable = openResource( 
             self.getResource(), 
             'r', 
-            self.getEncoding(),
+            'latin1',
             username = self.htaccess_username,
             password = self.htaccess_password,
             realm = self.htaccess_realm,
@@ -243,7 +246,6 @@ class FileSource( Source ):
 
     # unicode
     def getResource( self ):
-
         return self.resource
 
     # unicode

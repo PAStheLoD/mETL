@@ -18,13 +18,17 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program. If not, <see http://www.gnu.org/licenses/>.
 """
+from metl.target.base import Target
 
-class Manager( object ):
+
+class Manager(object):
 
     # void
-    def __init__( self, target, migration_resource = None, target_migration_resource = None ):
+    def __init__( self, target: Target, migration_resource=None, target_migration_resource=None):
 
         self.target = target
+        print(type(target))
+        print(target)
 
         if migration_resource is not None:
             self.target.setMigrationResource( migration_resource )
@@ -34,7 +38,6 @@ class Manager( object ):
 
     # void
     def run( self ):
-
         self.target.initialize()
         self.target.write()
         self.target.finalize()

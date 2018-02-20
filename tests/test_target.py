@@ -26,6 +26,11 @@ from metl.config import Config
 from metl.exception import *
 from metl.utils import *
 
+from os.path import join, abspath, dirname
+root = dirname(dirname(abspath(__file__)))
+import os
+os.chdir(root)
+
 class Test_Target( unittest.TestCase ):
 
     def setUp( self ):
@@ -154,7 +159,7 @@ class Test_Target( unittest.TestCase ):
     def test_db_target_update( self ):
 
         self.getHashForFile('tests/config/test_db_target_table.yml', delete = False )
-        self.getHashForFile('tests/config/test_db_target_update.yml', migration_resource = 'tests/test_migration/test_migration.pickle', delete = False )
+        self.getHashForFile('tests/config/test_db_target_update.yml', migration_resource=join(root, 'tests/test_migration/test_migration.pickle'), delete=False)
 
         s = DatabaseSource( FieldSet([
             Field( 'lat', FloatFieldType() )

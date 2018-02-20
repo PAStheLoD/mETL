@@ -18,11 +18,11 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program. If not, <see http://www.gnu.org/licenses/>.
 """
+import csv, codecs
+import metl.source.base
 
-import metl.source.base, csv, codecs, io
 
 class UTF8Recoder:
-
     def __init__(self, f, encoding):
         self.reader = codecs.getreader(encoding)(f)
 
@@ -30,39 +30,41 @@ class UTF8Recoder:
         return self
 
     def __next__(self):
-        return self.reader.next().encode("utf-8")
+        r = self.reader.readline()
+        if not r:
+            raise StopIteration
+        return r
+
 
 class UnicodeReader:
-
     def __init__(self, f, dialect=csv.excel, encoding="utf-8", **kwds):
         f = UTF8Recoder(f, encoding)
         self.reader = csv.reader(f, dialect=dialect, **kwds)
 
     def __next__(self):
         row = next(self.reader)
-        return [str(s, "utf-8") for s in row]
+        return [s for s in row]
 
     def __iter__(self):
         return self
 
-class CSVSource( metl.source.base.FileSource ):
 
-    init = ['delimiter','quote','skipRows','headerRow']
+class CSVSource(metl.source.base.FileSource):
+    init = ['delimiter', 'quote', 'skipRows', 'headerRow']
 
     # void
-    def __init__( self, fieldset, delimiter = ',', quote = '"', skipRows = 0, headerRow = None, **kwargs ):
+    def __init__(self, fieldset, delimiter=',', quote='"', skipRows=0, headerRow=None, **kwargs):
+        self.delimiter   = delimiter
+        self.quote       = quote
+        self.headerRow   = headerRow
+        self.headers     = {}
+        self.file_reader = None
 
-        self.delimiter  = delimiter
-        self.quote      = quote
-        self.headerRow  = headerRow
-        self.headers    = {}
-
-        super( CSVSource, self ).__init__( fieldset, **kwargs )
-        self.setOffsetNumber( skipRows )
+        super(CSVSource, self).__init__(fieldset, **kwargs)
+        self.setOffsetNumber(skipRows)
 
     # CSVSource
-    def clone( self ):
-
+    def clone(self):
         return self.__class__(
             self.fieldset.clone(),
             delimiter = self.delimiter,
@@ -72,10 +74,9 @@ class CSVSource( metl.source.base.FileSource ):
         )
 
     # void
-    def initialize( self ):
-
-        self.file_pointer, self.file_closable = metl.source.base.openResource( 
-            self.getResource(), 
+    def initialize(self):
+        self.file_pointer, self.file_closable = metl.source.base.openResource(
+            self.getResource(),
             'rb',
             username = self.htaccess_username,
             password = self.htaccess_password,
@@ -86,36 +87,32 @@ class CSVSource( metl.source.base.FileSource ):
             'delimiter': self.delimiter,
             'encoding': self.getEncoding()
         }
-        if self.quote is not None and len( self.quote ):
+        if self.quote is not None and self.quote != "":
             csv_params['quotechar'] = self.quote
         else:
             csv_params['quoting'] = csv.QUOTE_NONE
 
-        self.file_reader  = UnicodeReader( 
-            self.file_pointer, 
+        self.file_reader = UnicodeReader(
+            self.file_pointer,
             ** csv_params
         )
         return self.base_initialize()
 
     # void
-    def invalidOffsetRecord( self, record ):
-
+    def invalidOffsetRecord(self, record):
         if self.headerRow is None:
             return
 
-        if self.current == int( self.headerRow ):
+        if self.current == int(self.headerRow):
             self.headers = record
 
     # list
-    def getRecordsList( self ):
-
+    def getRecordsList(self):
         return self.file_reader
 
     # FieldSet
-    def getTransformedRecord( self, record ):
+    def getTransformedRecord(self, record):
 
         if self.headerRow is None:
             return record
-
-        else:
-            return dict( list(zip( self.headers, record )) )
+        return dict(list(zip(self.headers, record)))

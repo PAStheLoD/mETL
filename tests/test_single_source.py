@@ -24,26 +24,33 @@ from metl.manager import Manager
 from metl.configparser import ConfigParser
 from metl.config import Config
 
+from os.path import join, abspath, dirname
+root = dirname(dirname(abspath(__file__)))
+import os
+os.chdir(root)
+
+
 class Test_Single_Source( unittest.TestCase ):
 
-    def test_xml_source( self ):
+    def test_xml_source(self):
+        self.cfg_file = join(root, 'tests/config/test_xml_single_source.yml')
 
-        self.cfg_file = 'tests/config/test_xml_single_source.yml'
-
-    def test_json_source( self ):
-
-        self.cfg_file = 'tests/config/test_json_single_source.yml'
+    def test_json_source(self):
+        self.cfg_file = join(root, 'tests/config/test_json_single_source.yml')
 
     def tearDown( self ):
-
-        configparser = ConfigParser( Config( self.cfg_file ) )
+        configparser = ConfigParser(Config(self.cfg_file))
         target = configparser.getTarget()
-        manager = Manager( target ).run()
+        manager = Manager(target).run()
         results = target.getResults()
 
-        self.assertEqual( len( results ), 1 )
-        self.assertEqual( results[0].getField('formatted_name').getValue(), 'III. kerület, Óbuda-Békásmegyer, Óbudaisziget' )
-        self.assertEqual( results[0].getID(), '1-III. kerület, Óbuda-Békásmegyer, Óbudaisziget:1666851785540340219' )
+        r = results[0].getField('formatted_name').getValue()
+
+        self.assertEqual(len(results), 1)
+        self.assertEqual(
+            r,
+            'III. kerület, Óbuda-Békásmegyer, Óbudaisziget')
+        self.assertEqual(results[0].getID(), '1-III. kerület, Óbuda-Békásmegyer, Óbudaisziget:1666851785540340219')
 
 if __name__ == '__main__':
     unittest.main()

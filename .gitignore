@@ -35,3 +35,7 @@ nosetests.xml
 .pydevproject
 .DS_Store
 *.pyc
+
+.vscode
+.idea
+.mypy_cache

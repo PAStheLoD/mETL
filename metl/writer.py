@@ -21,6 +21,7 @@ along with this program. If not, <see http://www.gnu.org/licenses/>.
 
 import metl.base
 
+
 class Writer( metl.base.Base ):
 
     # void
@@ -39,6 +40,5 @@ class Writer( metl.base.Base ):
         return self.getReader().getRecords()
 
     # list<FieldSet>
-    def write( self, migration_date = None ):
-
+    def write(self, migration_date=None):
         raise RuntimeError( 'Writer.write() function is not implemented yet.' )

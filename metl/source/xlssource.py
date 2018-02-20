@@ -61,20 +61,20 @@ class XLSSource( metl.source.base.FileSource ):
 
         self.updateResourceDict( res_dict )
 
-        return super( XLSSource, self ).setResource( resource, encoding )
+        return super(XLSSource, self).setResource(resource, encoding)
 
-    def updateResourceDict( self, res_dict ):
+    def updateResourceDict(self, res_dict):
 
-        super( XLSSource, self ).updateResourceDict( res_dict )
+        super(XLSSource, self).updateResourceDict(res_dict)
 
         self.resource = self.res_dict['resource']
         self.sheetName = self.res_dict['sheetName'] or 0
         self.mergeSheets = self.res_dict['mergeSheets']
 
     # void
-    def initialize( self ):
+    def initialize(self):
 
-        super( XLSSource, self ).initialize()
+        super(XLSSource, self).initialize()
 
         self.workbook = xlrd.open_workbook(
             file_contents = self.file_pointer.read(),
@@ -82,20 +82,19 @@ class XLSSource( metl.source.base.FileSource ):
         )
 
         if self.mergeSheets:
-            self.sheets = [ self.workbook.sheet_by_name( sheetName ) \
-                for sheetName in self.workbook.sheet_names() ]
+            self.sheets = [self.workbook.sheet_by_name(sheetName) \
+                           for sheetName in self.workbook.sheet_names()]
 
         else:
-            self.sheets = [ self.workbook.sheet_by_index( self.sheetName ) \
-                if type( self.sheetName ) == int \
-                else self.workbook.sheet_by_name( self.sheetName ) ]
+            self.sheets = [self.workbook.sheet_by_index(self.sheetName) \
+                           if type(self.sheetName) == int \
+                           else self.workbook.sheet_by_name(self.sheetName)]
 
-        self.rowCounts = [ sheet.nrows for sheet in self.sheets ]
+        self.rowCounts = [sheet.nrows for sheet in self.sheets]
 
         return self.base_initialize()
 
-    def getEncoding( self ):
-
+    def getEncoding(self):
         return None
 
     # list

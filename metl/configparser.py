@@ -46,9 +46,10 @@ def getMore( d, keys, only = False ):
 
     return rd
 
+
 class ConfigParser( object ):
 
-    def __init__( self, config, debug = False, offset = None, limit = None, source_resource = None, init_on_start = True ):
+    def __init__(self, config, debug=False, offset=None, limit=None, source_resource=None, init_on_start=True):
 
         self.config          = config
         self.target          = None
@@ -60,14 +61,14 @@ class ConfigParser( object ):
         if init_on_start:
             self.init()
 
-    def init( self ):
+    def init(self):
 
         self.loadSource()
         self.loadManipulations()
         self.loadTarget()
 
     # cls
-    def lookupClass( self, name, nametype ):
+    def lookupClass(self, name, nametype):
 
         inner_path = 'metl.%(nametypelower)s.%(namelower)s%(nametypelower)s.%(name)s%(nametype)s' % {
             'nametype': nametype,
@@ -142,15 +143,14 @@ class ConfigParser( object ):
         return self.getReaders()[-1]
 
     # Target
-    def getTarget( self ):
-
+    def getTarget(self):
         return self.target
 
     # void
     def loadSource( self ):
 
         if 'source' not in self.config:
-            raise ConfigError( 'Config must have source attribute' )
+            raise ConfigError('Config must have source attribute')
 
         self.readers = [ self.loadSourceObject( self.config.get('source'), base = True ) ]
         if self.offset is not None:

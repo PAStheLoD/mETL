@@ -77,15 +77,15 @@ class Test_Transform( unittest.TestCase ):
     def test_converttype_transform_hard_with_default( self ):
 
         self.field.setValue('four miles')
-        self.field.setFinalType( DateFieldType() )
-        self.field.setTransforms([ ConvertTypeTransform( 'Date', hard = True, defaultValue = datetime.date.today() ) ]).run()
+        self.field.setFinalType(DateFieldType())
+        self.field.setTransforms([ConvertTypeTransform( 'Date', hard = True, defaultValue = datetime.date.today() ) ]).run()
         self.assertEqual( self.field.getValue(), datetime.date.today() )
 
     def test_homogenize_transform( self ):
 
         self.field.setValue('árvíztűrőtükörfúrógépÁRVÍZTŰRŐTÜKÖRFÚRÓGÉP')
-        self.field.setTransforms([ HomogenizeTransform ]).run()
-        self.assertEqual( self.field.getValue(), 'arvizturotukorfurogeparvizturotukorfurogep' )
+        self.field.setTransforms([HomogenizeTransform]).run()
+        self.assertEqual(self.field.getValue(), 'arvizturotukorfurogeparvizturotukorfurogep')
 
     def test_lowercase_transform( self ):
 

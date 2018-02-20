@@ -33,16 +33,22 @@ from metl.filter.dropfieldfilter import DropFieldFilter
 from metl.filter.keepbyconditionfilter import KeepByConditionFilter
 from metl.source.staticsource import StaticSource
 
-class Test_Filter( unittest.TestCase ):
+from os.path import join, abspath, dirname
+root = dirname(dirname(abspath(__file__)))
+import os
+os.chdir(root)
 
-    def setUp( self ):
+
+class Test_Filter(unittest.TestCase):
+
+    def setUp(self):
 
         self.reader = StaticSource(
             FieldSet([
-                Field( 'name', StringFieldType() ),
-                Field( 'email', StringFieldType() ),
-                Field( 'year', IntegerFieldType() ),
-                Field( 'after_year', IntegerFieldType() )
+                Field('name', StringFieldType()),
+                Field('email', StringFieldType()),
+                Field('year', IntegerFieldType()),
+                Field('after_year', IntegerFieldType())
             ],
             FieldMap({
                 'name': 0,
@@ -178,7 +184,7 @@ class Test_Filter( unittest.TestCase ):
             [ 'Sergeant Strawberry', 'Sergeant Strawberry@metl-test-data.com' ]
         ])
 
-    def test_logger_filter_default( self ):
+    def test_logger_filter_default(self):
 
         filtr = DropByConditionFilter( 
             self.reader,
@@ -186,37 +192,38 @@ class Test_Filter( unittest.TestCase ):
             fieldNames = 'year'
         )
         filtr.setLogFile( 
-            logFile = 'tests/logger', 
+            logFile = join(root, 'tests/logger'), 
             appendLog = False, 
             logger = None 
         )
         filtr.initialize()
-        records = [ r for r in filtr.getRecords() ]
+        records = [r for r in filtr.getRecords()]
         filtr.finalize()
 
-        hashcode = hashlib.md5( open( 'tests/logger', 'rb' ).read() ).hexdigest()
-        os.unlink( 'tests/logger' )
+        hashcode = hashlib.md5(open('tests/logger', 'rb').read()).hexdigest()
+        os.unlink('tests/logger')
         self.assertEqual( hashcode, '95eff99740e2d8d2b50808357e006293' )
 
-    def test_logger_filter_fn( self ):
+    def test_logger_filter_fn(self):
 
-        filtr = DropByConditionFilter( 
+        filtr = DropByConditionFilter(
             self.reader,
-            condition = IsEqualCondition( 2008 ),
+            condition = IsEqualCondition(2008),
             fieldNames = 'year'
         )
-        filtr.setLogFile( 
-            logFile = 'tests/logger', 
-            appendLog = False, 
+        filtr.setLogFile(
+            logFile = join(root, 'tests/logger'), 
+            appendLog = False,
             logger = 'tests.test_filter.notDroppedLogger' 
         )
         filtr.initialize()
-        records = [ r for r in filtr.getRecords() ]
+        records = [r for r in filtr.getRecords()]
         filtr.finalize()
 
-        hashcode = hashlib.md5( open( 'tests/logger', 'rb' ).read() ).hexdigest()
-        os.unlink( 'tests/logger' )
-        self.assertEqual( hashcode, '3c30fe720f1b410fce6cf17651978b13' )
+        b = open('tests/logger', 'rb').read()
+        hashcode = hashlib.md5(b).hexdigest()
+        os.unlink('tests/logger')
+        self.assertEqual(hashcode, '3c30fe720f1b410fce6cf17651978b13')
 
     def test_drop_by_condition_filter( self ):
 
@@ -283,22 +290,22 @@ class Test_Filter( unittest.TestCase ):
             operation = 'OR'
         ).initialize().getRecords() ]
         
-        self.assertEqual( len( records ), 66 )
-        self.assertEqual( records[-1].getField('name').getValue(), 'Sergeant Strawberry' )
+        self.assertEqual(len( records ), 66)
+        self.assertEqual(records[-1].getField('name').getValue(), 'Sergeant Strawberry')
 
     def test_drop_field_filter( self ):
 
         records = [ r for r in DropFieldFilter(
             self.reader,
-            fieldNames = [ 'email', 'after_year' ]
+            fieldNames = ['email', 'after_year']
         ).initialize().getRecords() ]
-        sourceRecords = [ r for r in self.reader.getRecords() ]
+        sourceRecords = [r for r in self.reader.getRecords()]
 
-        self.assertEqual( len( sourceRecords ), len( records ) )
-        self.assertEqual( len( records[0].getFieldNames() ), 2 )
-        self.assertEqual( records[0].getFieldNames()[-1], 'year' )
+        self.assertEqual(len(sourceRecords), len(records))
+        self.assertEqual(len(records[0].getFieldNames()), 2)
+        self.assertEqual(records[0].getFieldNames()[-1], 'year')
 
-    def test_drop_by_source_filter( self ):
+    def test_drop_by_source_filter(self):
 
         f = DropBySourceFilter(
             self.reader,
@@ -313,12 +320,14 @@ class Test_Filter( unittest.TestCase ):
         self.assertEqual( len( records ), 2 )
         self.assertEqual( records[-1].getField('name').getValue(), 'Nocturnal Raven' )
 
-def notDroppedLogger( self, record, is_filtered ):
 
+def notDroppedLogger(self, record, is_filtered):
     if is_filtered:
         return
 
-    self.getLogFilePointer().write( str( record.getValues() ) )
+    r = record.getValues()
+    self.getLogFilePointer().write(str(r))
+
 
 if __name__ == '__main__':
     unittest.main()

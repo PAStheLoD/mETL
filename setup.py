@@ -28,7 +28,7 @@ setup(
     install_requires = [
         'python-dateutil',
         'xlrd',
-        'gdata',
+        'gdata==2.0.18.1',
         'demjson',
         'pyyaml',
         'sqlalchemy>=0.8',
@@ -40,5 +40,6 @@ setup(
         'py2neo',
         'dm'
     ],
+    dependency_links=['https://github.com/PAStheLoD/gdata-python-client/archive/master.zip#egg=gdata-2.0.18.1'],
     test_suite = "tests"
 )

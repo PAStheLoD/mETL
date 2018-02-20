@@ -38,6 +38,11 @@ from metl.expand.meltexpand import MeltExpand
 from metl.source.staticsource import StaticSource
 from metl.source.csvsource import CSVSource
 
+from os.path import join, abspath, dirname
+root = dirname(dirname(abspath(__file__)))
+import os
+os.chdir(root)
+
 class Test_Expand( unittest.TestCase ):
 
     def setUp( self ):
@@ -193,7 +198,7 @@ class Test_Expand( unittest.TestCase ):
             })
         ) )
         source.setResource('tests/test_sources/test_csv_append.csv')
-        expand = AppendExpand( source, resource = 'tests/test_sources/test_csv_appended.csv' )
+        expand = AppendExpand(source, resource=join(root, 'tests/test_sources/test_csv_appended.csv'))
         expand.initialize()
         records = [ r for r in expand.getRecords() ]
         expand.finalize()

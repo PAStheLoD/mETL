@@ -21,21 +21,21 @@ along with this program. If not, <see http://www.gnu.org/licenses/>.
 
 import os, sys, codecs, yaml, metl.source.base
 
-class Config( object ):
+
+class Config(object):
 
     # void
-    def __init__( self, resource ):
-        
+    def __init__(self, resource):
         self.configurations, self.dict = [], {}
-        self.loadYaml( resource )
+        self.loadYaml(resource)
         for cfg in self.configurations:
             self.mergeDict( cfg, self.dict )
 
     # void
-    def loadYaml( self, resource ):
+    def loadYaml(self, resource):
+        file_pointer, file_closeable = metl.source.base.openResource(resource, 'r')
+        rdict = yaml.load(file_pointer)
 
-        file_pointer, file_closeable = metl.source.base.openResource( resource, 'r' )
-        rdict = yaml.load( file_pointer )
         if file_closeable:
             file_pointer.close()
 

@@ -21,18 +21,19 @@ along with this program. If not, <see http://www.gnu.org/licenses/>.
 
 import metl.filter.base
 
-class DropByConditionFilter( metl.filter.base.Filter ):
 
-    init = ['condition','operation','fieldNames','fieldNames']
+class DropByConditionFilter(metl.filter.base.Filter):
+
+    init = ['condition', 'operation', 'fieldNames', 'fieldNames']
 
     # void
-    def __init__( self, reader, condition, fieldNames, operation = 'AND', *args, **kwargs ):
+    def __init__(self, reader, condition, fieldNames, operation = 'AND', *args, **kwargs):
 
         self.condition = condition
-        self.fields    = fieldNames if type( fieldNames ) == list else [ fieldNames ]
+        self.fields    = fieldNames if type(fieldNames) == list else [fieldNames]
         self.operation = operation.upper()
 
-        super( DropByConditionFilter, self ).__init__( reader, *args, **kwargs )
+        super(DropByConditionFilter, self).__init__(reader, *args, **kwargs)
 
     # bool
     def isANDOperation( self ):
@@ -52,9 +53,9 @@ class DropByConditionFilter( metl.filter.base.Filter ):
                 continue
 
             try:
-                result = self.condition.getResult( field )
+                result = self.condition.getResult(field)
             except:
-                result = self.condition( field )
+                result = self.condition(field)
 
             if result and self.isOROperation():
                 return True
